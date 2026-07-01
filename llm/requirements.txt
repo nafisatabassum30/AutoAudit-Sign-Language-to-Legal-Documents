@@ -1,0 +1,45 @@
+# ============================================================
+# BdSL FIR LLM — Python dependencies
+# Python 3.10+, CUDA 12.1+ recommended
+# ============================================================
+
+# ── Core ML / NLP ────────────────────────────────────────────
+torch>=2.2.0
+torchvision>=0.17.0
+transformers>=4.40.0
+datasets>=2.19.0
+tokenizers>=0.19.0
+accelerate>=0.29.0
+peft>=0.10.0
+trl>=0.8.6
+
+# ── Quantisation (QLoRA) ─────────────────────────────────────
+bitsandbytes>=0.43.0
+
+# ── Fast Training (optional but highly recommended) ──────────
+# Install Unsloth separately for 2-5x speedup:
+#   pip install "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
+# or for a specific CUDA version:
+#   pip install "unsloth[cu121-ampere-torch220]"
+
+# ── Evaluation Metrics ───────────────────────────────────────
+sacrebleu>=2.4.0
+rouge-score>=0.1.2
+
+# ── API ──────────────────────────────────────────────────────
+flask>=3.0.0
+flask-cors>=4.0.0
+
+# ── Config / Utilities ───────────────────────────────────────
+pyyaml>=6.0.1
+python-dotenv>=1.0.0
+tqdm>=4.66.0
+numpy>=1.26.0
+
+# ── Notebooks ────────────────────────────────────────────────
+jupyter>=1.0.0
+pandas>=2.2.0
+matplotlib>=3.8.0
+
+# ── TensorBoard (training visualisation) ─────────────────────
+tensorboard>=2.16.0

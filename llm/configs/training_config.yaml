@@ -1,0 +1,80 @@
+# ============================================================
+# BdSL FIR LLM — QLoRA Training Configuration
+# ============================================================
+# Targets an 80 GB A100 GPU (single card).
+# For smaller cards (24 GB RTX 3090/4090) reduce batch size
+# and set bf16: false, fp16: true.
+# ============================================================
+
+# Data
+data_dir: data/synthetic
+max_seq_length: 1024
+
+# Output
+output_dir: models/checkpoints
+logging_dir: models/logs
+
+# ── Base Model ──────────────────────────────────────────────
+model:
+  model_name: "unsloth/llama-3-8b-bnb-4bit"
+  load_in_4bit: true
+  bnb_4bit_quant_type: "nf4"
+  bnb_4bit_compute_dtype: "float16"
+  bnb_4bit_use_double_quant: true
+  trust_remote_code: true
+  use_cache: false
+
+# ── LoRA Adapter ────────────────────────────────────────────
+lora:
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  bias: "none"
+  task_type: "CAUSAL_LM"
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+
+# ── Training Hyperparameters ─────────────────────────────────
+num_train_epochs: 3
+per_device_train_batch_size: 4
+per_device_eval_batch_size: 4
+gradient_accumulation_steps: 4
+warmup_steps: 100
+learning_rate: 2.0e-4
+weight_decay: 0.01
+lr_scheduler_type: "cosine"
+max_grad_norm: 0.3
+
+# ── Precision ────────────────────────────────────────────────
+fp16: false
+bf16: true
+
+# ── Checkpointing & Evaluation ──────────────────────────────
+save_strategy: "epoch"
+evaluation_strategy: "epoch"
+load_best_model_at_end: true
+metric_for_best_model: "eval_loss"
+save_total_limit: 2
+
+# ── Logging ─────────────────────────────────────────────────
+logging_steps: 50
+report_to: "tensorboard"
+
+# ── Reproducibility ─────────────────────────────────────────
+seed: 42
+
+# ============================================================
+# Smaller GPU config (uncomment to use 24 GB card):
+# ============================================================
+# per_device_train_batch_size: 1
+# per_device_eval_batch_size:  1
+# gradient_accumulation_steps: 16
+# bf16: false
+# fp16: true
+# max_seq_length: 512

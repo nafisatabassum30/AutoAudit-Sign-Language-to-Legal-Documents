@@ -1,0 +1,15 @@
+# ============================================================
+# BdSL FIR LLM — Inference Configuration
+# ============================================================
+
+model_path: "models/checkpoints/final_adapter"
+base_model_name: "unsloth/llama-3-8b-bnb-4bit"
+load_in_4bit: true
+max_new_tokens: 512
+temperature: 0.3
+top_p: 0.9
+top_k: 50
+repetition_penalty: 1.1
+do_sample: true
+device: "auto"
+merge_weights: false
