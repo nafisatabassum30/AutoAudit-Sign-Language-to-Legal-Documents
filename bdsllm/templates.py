@@ -1,0 +1,48 @@
+from __future__ import annotations
+
+from bdsllm.schema import IncidentFacts
+
+
+def _value(value: str, fallback: str = "প্রদান করা হয়নি") -> str:
+    value = value.strip()
+    return value if value else fallback
+
+
+def render_legal_complaint(facts: IncidentFacts) -> str:
+    """Render a FIR-style Bangla complaint without model generation.
+
+    This is used to create weak labels for early experiments and as a safe
+    fallback when an adapter/model is not available.
+    """
+
+    offense_type = _value(facts.offense_type, "অভিযোগ")
+    accused = _value(facts.accused_name, "অজ্ঞাত ব্যক্তি")
+    recognized_text = _value(facts.recognized_text, "প্রদান করা হয়নি")
+
+    return f"""বরাবর
+ভারপ্রাপ্ত কর্মকর্তা
+সংশ্লিষ্ট থানা, বাংলাদেশ।
+
+বিষয়: {offense_type} সংক্রান্ত অভিযোগ।
+
+জনাব,
+আমি {_value(facts.complainant_name, "অভিযোগকারী")}, ঠিকানা: {_value(facts.complainant_address)}। আমার ফোন নম্বর: {_value(facts.complainant_phone)}।
+
+ঘটনার বিবরণ
+তারিখ {_value(facts.incident_date)} সময় {_value(facts.incident_time)}-এ {_value(facts.incident_location)} স্থানে নিম্নোক্ত ঘটনা ঘটে: {recognized_text}
+অভিযুক্ত হিসেবে {accused}-এর নাম/পরিচয় পাওয়া গেছে। অভিযুক্তের অতিরিক্ত বিবরণ: {_value(facts.accused_details)}।
+
+সংযুক্ত তথ্য
+অপরাধের ধরন: {offense_type}
+অতিরিক্ত প্রেক্ষাপট: {_value(facts.additional_context, "নেই")}
+
+প্রার্থনা
+উপরোক্ত ঘটনার বিষয়ে {facts.requested_action or "আইনগত ব্যবস্থা গ্রহণের অনুরোধ করছি।"} প্রয়োজনীয় তদন্ত ও আইনগত ব্যবস্থা গ্রহণের জন্য বিনীত অনুরোধ করছি।
+
+অভিযোগকারীর তথ্য
+নাম: {_value(facts.complainant_name)}
+ঠিকানা: {_value(facts.complainant_address)}
+ফোন: {_value(facts.complainant_phone)}
+স্বাক্ষর: ____________________
+তারিখ: {_value(facts.incident_date)}
+""".strip()
