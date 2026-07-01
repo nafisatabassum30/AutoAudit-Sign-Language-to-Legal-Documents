@@ -1,0 +1,13 @@
+# Core
+torch>=2.2
+transformers>=4.44
+accelerate>=0.33
+peft>=0.12
+bitsandbytes>=0.43 ; platform_system == "Linux"
+datasets>=2.20
+pydantic>=2.6
+pyyaml>=6.0
+sentencepiece>=0.2
+
+# Evaluation / dev
+pytest>=8.0

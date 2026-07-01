@@ -1,0 +1,48 @@
+# Default hyperparameters for QLoRA fine-tuning of the FIR-generation LLM.
+#
+# The base model is deliberately NOT gated Llama-3 by default so this config
+# runs out-of-the-box without an HF token. Swap `base_model` to
+# "meta-llama/Meta-Llama-3.1-8B-Instruct" (per the original architecture
+# diagram) once you have accepted its license and exported HF_TOKEN -- no
+# other code changes are required since LoRA target module names are shared
+# across the Llama/Qwen/Mistral family of models.
+
+base_model: "Qwen/Qwen2.5-7B-Instruct"
+
+# Where the prepared train/val jsonl files live (see data/prepare_dataset.py)
+train_file: "data/processed/train.jsonl"
+val_file: "data/processed/val.jsonl"
+output_dir: "outputs/fir-qlora-adapter"
+
+# Quantization (set load_in_4bit: false to do plain LoRA on full precision,
+# e.g. when running on CPU for a smoke test with a tiny model)
+load_in_4bit: true
+bnb_4bit_quant_type: "nf4"
+bnb_4bit_compute_dtype: "bfloat16"
+bnb_4bit_use_double_quant: true
+
+# LoRA
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target_modules:
+  - "q_proj"
+  - "k_proj"
+  - "v_proj"
+  - "o_proj"
+  - "gate_proj"
+  - "up_proj"
+  - "down_proj"
+
+# Training
+max_seq_length: 1024
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8
+learning_rate: 2.0e-4
+num_train_epochs: 3
+warmup_ratio: 0.03
+lr_scheduler_type: "cosine"
+logging_steps: 10
+eval_steps: 50
+save_steps: 50
+seed: 42

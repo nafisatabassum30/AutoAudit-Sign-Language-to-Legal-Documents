@@ -1,0 +1,44 @@
+# Small, CPU-friendly config used to smoke-test that the data -> train ->
+# save -> load -> infer plumbing works end-to-end. SmolLM2-135M is a real
+# (if tiny and weakly multilingual) pretrained model, so this also produces
+# a genuine decreasing training loss -- but it is NOT expected to produce
+# fluent Bangla, since it wasn't pretrained on much Bangla text. For real
+# training use configs/lora_qlora.yaml (or point base_model at Llama-3 /
+# Qwen2.5 / another Bangla-capable instruct model) on a GPU machine.
+
+base_model: "HuggingFaceTB/SmolLM2-135M-Instruct"
+
+train_file: "data/processed/smoke_train.jsonl"
+val_file: "data/processed/smoke_val.jsonl"
+output_dir: "outputs/smoke_test"
+
+load_in_4bit: false
+use_lora: true
+
+lora_r: 4
+lora_alpha: 8
+lora_dropout: 0.0
+lora_target_modules:
+  - "q_proj"
+  - "k_proj"
+  - "v_proj"
+  - "o_proj"
+  - "gate_proj"
+  - "up_proj"
+  - "down_proj"
+
+# NOTE: SmolLM2's tokenizer is English-centric and very inefficient on Bangla
+# script (~2 tokens/char), so even short Bangla examples need a large budget
+# here. A real Bangla-capable tokenizer (Qwen2.5, Llama-3, etc., used by
+# configs/lora_qlora.yaml) needs far fewer tokens for the same text.
+max_seq_length: 3072
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 1
+learning_rate: 1.0e-3
+num_train_epochs: 3
+warmup_ratio: 0.0
+lr_scheduler_type: "constant"
+logging_steps: 1
+eval_steps: 5
+save_steps: 1000
+seed: 42
