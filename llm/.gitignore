@@ -1,0 +1,10 @@
+outputs/*
+!outputs/.gitkeep
+data/processed/
+data/raw/*
+!data/raw/.gitkeep
+*.pyc
+__pycache__/
+.pytest_cache/
+*.egg-info/
+wandb/

@@ -1,0 +1,20 @@
+# Core ML stack
+torch>=2.3
+transformers>=4.44
+accelerate>=0.33
+peft>=0.11
+datasets>=2.20
+sentencepiece>=0.2.0
+
+# QLoRA 4-bit quantization (GPU only -- install separately if you don't have CUDA)
+bitsandbytes>=0.43; platform_system == "Linux"
+
+# Config & serving
+pyyaml>=6.0
+flask>=3.0
+
+# Evaluation
+rouge-score>=0.1.2
+
+# Dev / testing
+pytest>=8.0
