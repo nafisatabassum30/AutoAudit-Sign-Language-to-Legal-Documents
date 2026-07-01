@@ -1,0 +1,8 @@
+# Lightweight requirements: data generation, schema validation, JSON
+# post-processing, document rendering, the Flask API (with an injected /
+# stub generation backend), and the test suite. No GPU or heavy ML
+# dependencies required.
+pydantic>=2.6
+flask>=3.0
+pyyaml>=6.0
+pytest>=8.0

@@ -1,0 +1,34 @@
+# Training configuration for QLoRA fine-tuning of the Bangla FIR LLM.
+#
+# `base_model` is swappable -- pick based on available GPU memory:
+#   - "hishab/titulm-llama-3.2-3b-v2.0"  -> small, Bangla-continual-pretrained, fits on a single 16GB GPU with QLoRA
+#   - "Qwen/Qwen2.5-7B-Instruct"          -> stronger multilingual/Bangla instruction following, needs ~24GB with QLoRA
+#   - "meta-llama/Meta-Llama-3.1-8B-Instruct" -> alternative strong multilingual base
+base_model: "hishab/titulm-llama-3.2-3b-v2.0"
+
+data_dir: "data/processed"
+output_dir: "outputs/fir-llm-lora"
+
+# 4-bit quantization (QLoRA)
+load_in_4bit: true
+bnb_4bit_quant_type: "nf4"
+bnb_4bit_compute_dtype: "bfloat16"
+bnb_4bit_use_double_quant: true
+
+max_seq_length: 1024
+num_train_epochs: 3
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 4
+learning_rate: 2.0e-4
+lr_scheduler_type: "cosine"
+warmup_ratio: 0.03
+weight_decay: 0.01
+logging_steps: 10
+eval_steps: 50
+save_steps: 50
+save_total_limit: 3
+seed: 42
+packing: false
+gradient_checkpointing: true
+bf16: true
+report_to: "none"

@@ -1,0 +1,15 @@
+# Full requirements for training + serving the FIR-generation LLM.
+# For a CPU-only / no-GPU environment (e.g. just running the data generator,
+# schema tests, or the API with a stub backend), `requirements-lite.txt` is
+# sufficient.
+
+-r requirements-lite.txt
+
+torch>=2.2
+transformers>=4.44
+peft>=0.12
+trl>=0.10
+bitsandbytes>=0.43
+accelerate>=0.33
+datasets>=2.20
+sentencepiece>=0.2
