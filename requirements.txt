@@ -1,0 +1,15 @@
+# ---------------------------------------------------------------------------
+# Core runtime (API + inference + data tooling).
+# These are lightweight and required to run the rule-based pipeline and API
+# without a GPU or downloading any model weights.
+# ---------------------------------------------------------------------------
+flask==3.0.3
+pyyaml==6.0.2
+pydantic==2.9.2
+
+# ---------------------------------------------------------------------------
+# LLM fine-tuning + inference stack (GPU recommended).
+# Install with:  pip install -r requirements.txt -r requirements-train.txt
+# They are intentionally kept in a separate file because bitsandbytes /
+# torch wheels are large and platform specific.
+# ---------------------------------------------------------------------------

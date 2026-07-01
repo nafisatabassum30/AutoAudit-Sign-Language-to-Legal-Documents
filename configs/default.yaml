@@ -1,0 +1,71 @@
+# ===========================================================================
+# AutoAudit — Bangla FIR LLM configuration
+# ===========================================================================
+# This config drives dataset generation, QLoRA fine-tuning and inference for
+# the LLM stage of the AutoAudit pipeline:
+#
+#   BdSL video -> (ST-GNN) -> raw Bangla text -> [THIS LLM] -> FIR complaint
+#
+# All paths are relative to the repository root unless absolute.
+# ===========================================================================
+
+model:
+  # Base model to fine-tune. Any HuggingFace causal-LM works. For Bangla,
+  # good starting points include:
+  #   - "meta-llama/Meta-Llama-3-8B-Instruct"   (gated, strong general model)
+  #   - "google/gemma-2-9b-it"
+  #   - "csebuetnlp/banglat5"                    (encoder-decoder; not causal)
+  # Default kept small-ish/config-driven; override for real training.
+  base_model: "meta-llama/Meta-Llama-3-8B-Instruct"
+  # Directory where the trained LoRA adapter is / will be saved.
+  adapter_dir: "outputs/adapter"
+  max_seq_length: 2048
+  # Load base model in 4-bit (QLoRA). Requires bitsandbytes + CUDA GPU.
+  load_in_4bit: true
+
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+training:
+  output_dir: "outputs/run"
+  num_train_epochs: 3
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 8
+  learning_rate: 2.0e-4
+  warmup_ratio: 0.03
+  weight_decay: 0.0
+  logging_steps: 10
+  save_steps: 100
+  lr_scheduler_type: "cosine"
+  bf16: true
+  seed: 42
+
+data:
+  train_file: "data/processed/train.jsonl"
+  eval_file: "data/processed/eval.jsonl"
+  # Used by the synthetic generator.
+  num_synthetic_examples: 400
+  eval_split: 0.1
+
+inference:
+  # If the fine-tuned adapter is unavailable (no GPU / weights not downloaded),
+  # the engine falls back to a deterministic rule-based FIR builder so the
+  # pipeline remains fully runnable and demonstrable.
+  allow_rule_based_fallback: true
+  max_new_tokens: 768
+  temperature: 0.3
+  top_p: 0.9
+
+api:
+  host: "0.0.0.0"
+  port: 8000

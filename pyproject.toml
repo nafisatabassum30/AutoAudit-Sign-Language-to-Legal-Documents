@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autoaudit-llm"
+version = "0.1.0"
+description = "Bangla FIR (First Information Report) LLM: converts recognized Bangladeshi Sign Language text into FIR-ready legal complaints."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "AutoAudit" }]
+keywords = ["bangla", "fir", "legal", "llm", "qlora", "sign-language"]
+
+dependencies = [
+    "flask>=3.0",
+    "pyyaml>=6.0",
+    "pydantic>=2.7",
+]
+
+[project.optional-dependencies]
+train = [
+    "torch>=2.2",
+    "transformers>=4.44",
+    "peft>=0.12",
+    "trl>=0.9",
+    "datasets>=2.20",
+    "accelerate>=0.33",
+    "bitsandbytes>=0.43",
+    "sentencepiece>=0.2",
+]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+autoaudit-generate-data = "autoaudit_llm.cli:generate_data_main"
+autoaudit-train = "autoaudit_llm.cli:train_main"
+autoaudit-infer = "autoaudit_llm.cli:infer_main"
+autoaudit-serve = "autoaudit_llm.cli:serve_main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

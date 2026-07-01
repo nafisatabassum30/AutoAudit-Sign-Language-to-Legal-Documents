@@ -1,0 +1,20 @@
+# ---------------------------------------------------------------------------
+# Heavy training / inference dependencies for QLoRA fine-tuning of the
+# Bangla FIR LLM. A CUDA-capable GPU is strongly recommended.
+#
+#   pip install -r requirements.txt
+#   pip install -r requirements-train.txt
+#
+# Torch is intentionally left unpinned to a CUDA build so you can pick the
+# wheel that matches your CUDA version, e.g.:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu121
+# ---------------------------------------------------------------------------
+torch>=2.2
+transformers>=4.44
+peft>=0.12
+trl>=0.9
+datasets>=2.20
+accelerate>=0.33
+bitsandbytes>=0.43
+sentencepiece>=0.2
+scipy>=1.13
