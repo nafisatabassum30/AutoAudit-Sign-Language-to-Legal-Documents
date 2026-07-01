@@ -1,0 +1,54 @@
+# QLoRA fine-tuning configuration for the BdSL-raw-text -> FIR-JSON LLM stage.
+#
+# `base_model` defaults to a small, ungated, multilingual instruct model so the
+# pipeline can be smoke-tested on CPU/limited hardware out of the box. For a
+# production-quality run, swap in a larger multilingual/Bangla-capable model,
+# e.g. "meta-llama/Meta-Llama-3.1-8B-Instruct" (gated, needs HF access) or
+# "Qwen/Qwen2.5-7B-Instruct" (open, strong multilingual + Bangla support).
+
+base_model: "Qwen/Qwen2.5-0.5B-Instruct"
+output_dir: "checkpoints/fir-lora"
+
+data:
+  train_path: "data/processed/train.jsonl"
+  val_path: "data/processed/val.jsonl"
+  max_seq_length: 1024
+
+quantization:
+  load_in_4bit: true
+  bnb_4bit_compute_dtype: "bfloat16"
+  bnb_4bit_quant_type: "nf4"
+  bnb_4bit_use_double_quant: true
+
+lora:
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  bias: "none"
+  task_type: "CAUSAL_LM"
+  # Standard attention/MLP projection names for Llama/Qwen-style decoder models.
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+
+training:
+  num_train_epochs: 3
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 4
+  gradient_accumulation_steps: 4
+  learning_rate: 2.0e-4
+  lr_scheduler_type: "cosine"
+  warmup_ratio: 0.03
+  weight_decay: 0.0
+  logging_steps: 10
+  eval_strategy: "epoch"
+  save_strategy: "epoch"
+  save_total_limit: 2
+  bf16: true
+  seed: 42
+  report_to: "none"

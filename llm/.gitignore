@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# Model checkpoints / adapters (large, environment-specific)
+checkpoints/
+*.safetensors
+*.bin
+*.pt
+*.ckpt
+
+# Locally regenerated / real-data variants (keep the committed starter dataset in data/processed/)
+data/processed_real/
+
+# Local env files
+.env
