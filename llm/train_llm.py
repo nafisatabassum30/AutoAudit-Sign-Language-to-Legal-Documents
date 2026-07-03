@@ -1,112 +1,62 @@
 import argparse
-import json
+import random
 from pathlib import Path
+
 import torch
 from datasets import load_dataset
-from transformers import (
-    AutoTokenizer,
-    AutoModelForCausalLM,
-    TrainingArguments,
-    Trainer,
-    default_data_collator,
-    BitsAndBytesConfig,
-)
-from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, DataCollatorForSeq2Seq, Seq2SeqTrainer, Seq2SeqTrainingArguments
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Fine-tune a Bangla LLM with QLoRA for legal complaints")
+    parser = argparse.ArgumentParser(description="Fine-tune a Bengali-capable seq2seq model for FIR generation")
     parser.add_argument("--train_file", type=Path, required=True, help="Path to JSONL training data")
     parser.add_argument("--output_dir", type=Path, default=Path("output/llm"), help="Directory to save the fine-tuned model")
-    parser.add_argument("--model_name_or_path", type=str, default="sagorsarker/bangla-llama-3b", help="Base model name or path")
-    parser.add_argument("--max_length", type=int, default=1024, help="Maximum token length for each example")
-    parser.add_argument("--batch_size", type=int, default=4, help="Training batch size per device")
+    parser.add_argument("--model_name_or_path", type=str, default="google/flan-t5-small", help="Base model name or path")
+    parser.add_argument("--max_source_length", type=int, default=512, help="Maximum token length for the source prompt")
+    parser.add_argument("--max_target_length", type=int, default=384, help="Maximum token length for the FIR output")
+    parser.add_argument("--batch_size", type=int, default=2, help="Training batch size per device")
     parser.add_argument("--learning_rate", type=float, default=2e-4, help="Learning rate")
-    parser.add_argument("--epochs", type=int, default=3, help="Number of training epochs")
-    parser.add_argument("--lora_r", type=int, default=8, help="LoRA rank")
-    parser.add_argument("--lora_alpha", type=int, default=16, help="LoRA alpha")
-    parser.add_argument("--lora_dropout", type=float, default=0.05, help="LoRA dropout")
+    parser.add_argument("--epochs", type=int, default=2, help="Number of training epochs")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--max_train_samples", type=int, default=None, help="Optionally limit training samples for quick experiments")
-    parser.add_argument("--dataset_format", type=str, choices=["auto", "prompt_completion", "text_only"], default="auto", help="Training dataset format")
     return parser.parse_args()
 
 
-def build_instruction_prompt(example):
-    instruction = example.get("instruction", "একটি বাংলা আইনি অভিযোগ / FIR তৈরি করুন")
-    input_text = example.get("input", "")
-    if input_text:
-        prompt = (
-            f"নির্দেশ: {instruction}\n"
-            f"আইনগত ঘটনার সারসংক্ষেপ: {input_text}\n"
-            "FIR:"
-        )
-    else:
-        prompt = f"নির্দেশ: {instruction}\nFIR:"
+def set_seed(seed: int) -> None:
+    random.seed(seed)
+    torch.manual_seed(seed)
 
+
+def build_instruction_prompt(example):
+    instruction = example.get("instruction", "একটি পূর্ণাঙ্গ বাংলা FIR/অভিযোগপত্র তৈরি করুন")
+    input_text = example.get("input", "")
+    prompt = (
+        f"নির্দেশ: {instruction}. শুধু FIR/অভিযোগপত্রের বিষয়বস্তু লিখুন, কোনো অতিরিক্ত ব্যাখ্যা দেবেন না.\n"
+        f"ঘটনার বিবরণ: {input_text}\n"
+        "FIR/অভিযোগপত্র:"
+    )
     output_text = example.get("output", "")
     return prompt, output_text
 
 
-def detect_dataset_format(example):
-    if "text" in example:
-        return "text_only"
-    if "instruction" in example and "input" in example and "output" in example:
-        return "prompt_completion"
-    return "text_only"
-
-
-def tokenize_example(example, tokenizer, max_length, dataset_format):
-    if dataset_format == "text_only":
-        text = example.get("text", "").strip()
-        full_text = f"{text} {tokenizer.eos_token or ''}".strip()
-        tokenized = tokenizer(full_text, truncation=True, max_length=max_length, padding=False)
-        return {
-            "input_ids": tokenized["input_ids"],
-            "attention_mask": tokenized["attention_mask"],
-            "labels": tokenized["input_ids"],
-        }
-
-    prompt, output_text = build_instruction_prompt(example)
-    full_text = f"{prompt} {output_text} {tokenizer.eos_token or ''}".strip()
-    tokenized_full = tokenizer(full_text, truncation=True, max_length=max_length, padding=False)
-    tokenized_prompt = tokenizer(prompt, truncation=True, max_length=max_length, padding=False)
-
-    input_ids = tokenized_full["input_ids"]
-    labels = input_ids.copy()
-    prompt_length = len(tokenized_prompt["input_ids"])
-    labels[:prompt_length] = [-100] * prompt_length
-
-    return {
-        "input_ids": input_ids,
-        "attention_mask": tokenized_full["attention_mask"],
-        "labels": labels,
-    }
-
-
-def preprocess(dataset, tokenizer, max_length, dataset_format):
-    if dataset_format == "auto":
-        first = dataset[0]
-        dataset_format = detect_dataset_format(first)
-        print(f"Auto-detected dataset format: {dataset_format}")
-
+def preprocess(dataset, tokenizer, max_source_length, max_target_length):
     def _tokenize(example):
-        return tokenize_example(example, tokenizer, max_length, dataset_format)
+        prompt, output_text = build_instruction_prompt(example)
+        model_inputs = tokenizer(prompt, truncation=True, max_length=max_source_length, padding=False)
+        labels = tokenizer(output_text, truncation=True, max_length=max_target_length, padding=False)
+        model_inputs["labels"] = labels["input_ids"]
+        return model_inputs
 
-    tokenized = dataset.map(
-        _tokenize,
-        batched=False,
-        remove_columns=dataset.column_names,
-    )
-    return tokenized
+    return dataset.map(_tokenize, batched=False, remove_columns=dataset.column_names)
 
 
 def main():
     args = parse_args()
     args.output_dir.mkdir(parents=True, exist_ok=True)
+    set_seed(args.seed)
 
     model_name = args.model_name_or_path
-    fallback_model = "gpt2"
+    fallback_model = "google/flan-t5-small"
 
     try:
         print(f"Loading tokenizer from {model_name}")
@@ -120,74 +70,40 @@ def main():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    if torch.cuda.is_available():
-        print("Loading model with 4-bit quantization support")
-        bnb_config = BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_compute_dtype=torch.float16,
-            bnb_4bit_use_double_quant=True,
-            bnb_4bit_quant_type="nf4",
-        )
-        model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            quantization_config=bnb_config,
-            device_map="auto",
-            trust_remote_code=True,
-        )
-    else:
-        print("CUDA is not available; using CPU-friendly full-precision loading")
-        model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            torch_dtype=torch.float32,
-            trust_remote_code=True,
-        )
-
-    if torch.cuda.is_available():
-        model = prepare_model_for_kbit_training(model)
-
-    model.enable_input_require_grads()
-    peft_config = LoraConfig(
-        task_type="CAUSAL_LM",
-        inference_mode=False,
-        r=args.lora_r,
-        lora_alpha=args.lora_alpha,
-        lora_dropout=args.lora_dropout,
-        target_modules=["c_attn", "c_proj"],
+    print("CUDA is not available; using CPU-friendly full-precision loading")
+    model = AutoModelForSeq2SeqLM.from_pretrained(
+        model_name,
+        torch_dtype=torch.float32,
+        trust_remote_code=True,
     )
-    model = get_peft_model(model, peft_config)
 
     print(f"Loading training data from {args.train_file}")
     dataset = load_dataset("json", data_files=str(args.train_file), split="train")
     if args.max_train_samples is not None:
         dataset = dataset.select(range(min(args.max_train_samples, len(dataset))))
 
-    tokenized_dataset = preprocess(dataset, tokenizer, args.max_length, args.dataset_format)
+    tokenized_dataset = preprocess(dataset, tokenizer, args.max_source_length, args.max_target_length)
 
-    use_fp16 = torch.cuda.is_available()
-    optim = "paged_adamw_8bit" if torch.cuda.is_available() else "adamw_torch"
-
-    training_args = TrainingArguments(
+    training_args = Seq2SeqTrainingArguments(
         output_dir=str(args.output_dir),
         per_device_train_batch_size=args.batch_size,
-        gradient_accumulation_steps=1,
         learning_rate=args.learning_rate,
         num_train_epochs=args.epochs,
-        logging_steps=20,
-        save_steps=200,
-        save_total_limit=3,
-        fp16=use_fp16,
-        optim=optim,
-        eval_strategy="no",
-        remove_unused_columns=False,
+        logging_steps=10,
+        save_steps=100,
+        save_total_limit=2,
+        fp16=torch.cuda.is_available(),
         report_to="none",
+        remove_unused_columns=False,
         seed=args.seed,
     )
 
-    trainer = Trainer(
+    data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model, padding=True)
+    trainer = Seq2SeqTrainer(
         model=model,
         args=training_args,
         train_dataset=tokenized_dataset,
-        data_collator=default_data_collator,
+        data_collator=data_collator,
     )
 
     print("Starting training")
