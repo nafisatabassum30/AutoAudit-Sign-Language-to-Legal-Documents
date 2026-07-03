@@ -1,10 +1,17 @@
 ﻿# simple_prepare.py
 import argparse
 import json
+import sys
 from pathlib import Path
 
 import pandas as pd
 import random
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+from llm.dataset_utils import load_dataset_frame, resolve_text_column
 
 
 def parse_args():
@@ -18,17 +25,6 @@ def parse_args():
     parser.add_argument("--use_synthetic_crimes", action="store_true", help="Ignore input file and use built-in synthetic crime sentences.")
     parser.add_argument("--synthetic_count", type=int, default=100, help="Number of synthetic crime sentences to generate when using synthetic crimes.")
     return parser.parse_args()
-
-
-def load_corpus(input_path: Path, sheet_name: str = None):
-    suffix = input_path.suffix.lower()
-    if suffix == ".csv":
-        return pd.read_csv(input_path)
-    if suffix in {".xls", ".xlsx"}:
-        if sheet_name is None:
-            return pd.read_excel(input_path, sheet_name=0)
-        return pd.read_excel(input_path, sheet_name=sheet_name)
-    raise ValueError("Unsupported input file format. Use .csv, .xls, or .xlsx.")
 
 
 LEGAL_SUMMARY_TEMPLATES = [
@@ -75,7 +71,7 @@ def build_fir_text(summary: str) -> str:
 def main():
     args = parse_args()
     root = Path(__file__).resolve().parent.parent
-    input_path = args.input_file or root / "data" / "raw" / "FinalSheet2.xlsx"
+    input_path = args.input_file or root / "data" / "raw" / "sign_language_conflict.xlsx"
     output_path = args.output_file or root / "data" / "train" / "bangla_legal_train.jsonl"
 
     assert input_path.exists(), f"Dataset file not found: {input_path}"
@@ -95,11 +91,13 @@ def main():
         # Expand or truncate to requested synthetic_count
         repeats = max(1, (args.synthetic_count + len(CRIME_SENTENCES) - 1) // len(CRIME_SENTENCES))
         flat = (CRIME_SENTENCES * repeats)[: args.synthetic_count]
-        df = pd.DataFrame({"Names": flat})
+        df = pd.DataFrame({"Sentences": flat})
     else:
-        df = load_corpus(input_path, args.sheet_name)
+        df = load_dataset_frame(input_path, args.sheet_name)
     if args.max_rows is not None:
         df = df.head(args.max_rows)
+
+    text_field = args.text_field if hasattr(args, 'text_field') and args.text_field else resolve_text_column(df)
 
     training_data = []
     # Prepare offense types list
@@ -110,7 +108,7 @@ def main():
         offense_list = ["ধর্ষণ", "চুরি", "মাদক ব্যবসা", "হত্যা", "চাঁদাবাজি"]
 
     for _, row in df.iterrows():
-        sentence = str(row.get("Names", "")).strip()
+        sentence = str(row.get(text_field, "")).strip()
         if not sentence:
             continue
         selected_offense = None

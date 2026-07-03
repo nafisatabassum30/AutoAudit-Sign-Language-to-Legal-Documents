@@ -1,7 +1,9 @@
 import argparse
 from pathlib import Path
+import re
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
+from peft import PeftModel
 
 
 def parse_args():
@@ -15,25 +17,45 @@ def parse_args():
 
 
 def build_prompt(prompt_text: str) -> str:
-    return f"নির্দেশ: {prompt_text}\nউত্তর:"
+    return (
+        "নির্দেশ: আপনি একটি formal FIR/অভিযোগপত্র বাংলায় তৈরি করুন। "
+        "ঘটনার বিবরণ দেওয়া হলে, ১) মামলার শিরোনাম, ২) ঘটনার বিবরণ, ৩) অভিযোগের বর্ণনা, "
+        "৪) প্রমাণের উল্লেখ, এবং ৫) বাদীর আবেদন লিখুন।\n"
+        f"ঘটনার বিবরণ: {prompt_text}\n"
+        "FIR/অভিযোগপত্র:"
+    )
+
+
+def clean_generated_text(text: str) -> str:
+    text = text.strip()
+    if "FIR/অভিযোগপত্র:" in text:
+        text = text.split("FIR/অভিযোগপত্র:", 1)[1].strip()
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
 
 
 def main():
     args = parse_args()
+    base_model = "gpt2"
     print(f"Loading fine-tuned model from {args.model_dir}")
     tokenizer = AutoTokenizer.from_pretrained(args.model_dir, use_fast=False)
-    model = AutoModelForCausalLM.from_pretrained(
-        args.model_dir,
+    base_model_obj = AutoModelForCausalLM.from_pretrained(
+        base_model,
         device_map="auto",
-        torch_dtype=torch.float16,
+        torch_dtype=torch.float32,
         trust_remote_code=True,
     )
+    model = PeftModel.from_pretrained(base_model_obj, args.model_dir)
+    model.eval()
 
     prompt = build_prompt(args.prompt)
-    input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(model.device)
+    inputs = tokenizer(prompt, return_tensors="pt")
+    input_ids = inputs.input_ids.to(model.device)
+    attention_mask = inputs.attention_mask.to(model.device)
     output_ids = model.generate(
-        input_ids,
-        max_length=args.max_length,
+        input_ids=input_ids,
+        attention_mask=attention_mask,
+        max_new_tokens=args.max_length,
         temperature=args.temperature,
         top_p=args.top_p,
         do_sample=True,
@@ -43,8 +65,9 @@ def main():
     )
 
     result = tokenizer.decode(output_ids[0], skip_special_tokens=True)
+    cleaned = clean_generated_text(result)
     print("\n=== Generated Complaint ===\n")
-    print(result)
+    print(cleaned)
 
 
 if __name__ == "__main__":

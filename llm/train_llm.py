@@ -105,34 +105,54 @@ def main():
     args = parse_args()
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"Loading tokenizer from {args.model_name_or_path}")
-    tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path, use_fast=False)
+    model_name = args.model_name_or_path
+    fallback_model = "gpt2"
+
+    try:
+        print(f"Loading tokenizer from {model_name}")
+        tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
+    except Exception as exc:
+        print(f"Failed to load requested model {model_name}: {exc}")
+        print(f"Falling back to {fallback_model}")
+        tokenizer = AutoTokenizer.from_pretrained(fallback_model, use_fast=False)
+        model_name = fallback_model
+
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    print("Loading model with 4-bit quantization support")
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_compute_dtype=torch.float16,
-        bnb_4bit_use_double_quant=True,
-        bnb_4bit_quant_type="nf4",
-    )
+    if torch.cuda.is_available():
+        print("Loading model with 4-bit quantization support")
+        bnb_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_compute_dtype=torch.float16,
+            bnb_4bit_use_double_quant=True,
+            bnb_4bit_quant_type="nf4",
+        )
+        model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            quantization_config=bnb_config,
+            device_map="auto",
+            trust_remote_code=True,
+        )
+    else:
+        print("CUDA is not available; using CPU-friendly full-precision loading")
+        model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            torch_dtype=torch.float32,
+            trust_remote_code=True,
+        )
 
-    model = AutoModelForCausalLM.from_pretrained(
-        args.model_name_or_path,
-        quantization_config=bnb_config,
-        device_map="auto",
-        trust_remote_code=True,
-    )
+    if torch.cuda.is_available():
+        model = prepare_model_for_kbit_training(model)
 
-    model = prepare_model_for_kbit_training(model)
+    model.enable_input_require_grads()
     peft_config = LoraConfig(
         task_type="CAUSAL_LM",
         inference_mode=False,
         r=args.lora_r,
         lora_alpha=args.lora_alpha,
         lora_dropout=args.lora_dropout,
-        target_modules=["q_proj", "v_proj"],
+        target_modules=["c_attn", "c_proj"],
     )
     model = get_peft_model(model, peft_config)
 
@@ -143,6 +163,9 @@ def main():
 
     tokenized_dataset = preprocess(dataset, tokenizer, args.max_length, args.dataset_format)
 
+    use_fp16 = torch.cuda.is_available()
+    optim = "paged_adamw_8bit" if torch.cuda.is_available() else "adamw_torch"
+
     training_args = TrainingArguments(
         output_dir=str(args.output_dir),
         per_device_train_batch_size=args.batch_size,
@@ -152,9 +175,9 @@ def main():
         logging_steps=20,
         save_steps=200,
         save_total_limit=3,
-        fp16=True,
-        optim="paged_adamw_8bit",
-        evaluation_strategy="no",
+        fp16=use_fp16,
+        optim=optim,
+        eval_strategy="no",
         remove_unused_columns=False,
         report_to="none",
         seed=args.seed,
