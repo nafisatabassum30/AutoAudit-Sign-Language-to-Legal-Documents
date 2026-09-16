@@ -1,0 +1,13 @@
+{
+  "architecture": "Hybrid-1D-CNN-BiLSTM-Attention",
+  "input_dim": 258,
+  "num_frames": 32,
+  "num_classes": 3395,
+  "cnn_dim": 256,
+  "lstm_hidden": 256,
+  "lstm_layers": 2,
+  "bidirectional": true,
+  "attention_dim": 128,
+  "dropout": 0.35,
+  "description": "Dhrubo-inspired CNN feature extraction + temporal attention adapted to MediaPipe keypoint sentence classification."
+}

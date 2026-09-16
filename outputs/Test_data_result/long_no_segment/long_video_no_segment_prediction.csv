@@ -1,0 +1,11 @@
+﻿chunk_no,start_sec,end_sec,clip_file,predicted_sentence,confidence
+1,0.0,5.0,outputs\Test_data_result\long_no_segment\clips\chunk_001_0.0_5.0.mp4,তুমি কোনটা খাবে,0.3821
+2,5.0,10.0,outputs\Test_data_result\long_no_segment\clips\chunk_002_5.0_10.0.mp4,আমার খুব বেশি মাথা বেথা,0.4817
+3,10.0,15.0,outputs\Test_data_result\long_no_segment\clips\chunk_003_10.0_15.0.mp4,আমি তুমাকে পছন্দ করি,0.9917
+4,15.0,20.0,outputs\Test_data_result\long_no_segment\clips\chunk_004_15.0_20.0.mp4,ভিতরে আশুন এবং বসুন,0.2057
+5,20.0,25.0,outputs\Test_data_result\long_no_segment\clips\chunk_005_20.0_25.0.mp4,তোমার জন্মদিন ২২ জানুয়ারি,0.8258
+6,25.0,30.0,outputs\Test_data_result\long_no_segment\clips\chunk_006_25.0_30.0.mp4,আমার ছোট ভাই হাস দেখে নাই,0.2073
+7,30.0,35.0,outputs\Test_data_result\long_no_segment\clips\chunk_007_30.0_35.0.mp4,আমি তোমার ভাই,0.5189
+8,35.0,40.0,outputs\Test_data_result\long_no_segment\clips\chunk_008_35.0_40.0.mp4,মার্চে গ্রীষ্মকাল থাকে,0.3824
+9,40.0,45.0,outputs\Test_data_result\long_no_segment\clips\chunk_009_40.0_45.0.mp4,সকালের খাবার খাও,0.7748
+10,45.0,46.91,outputs\Test_data_result\long_no_segment\clips\chunk_010_45.0_46.9.mp4,আমার বোন অনেক গুলো ঘোড়া দেখে নাই,0.3294

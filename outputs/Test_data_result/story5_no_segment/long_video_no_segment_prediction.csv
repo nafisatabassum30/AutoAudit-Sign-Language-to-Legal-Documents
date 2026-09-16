@@ -1,0 +1,8 @@
+﻿chunk_no,start_sec,end_sec,clip_file,predicted_sentence,confidence
+1,0.0,5.0,outputs\Test_data_result\story5_no_segment\clips\chunk_001_0.0_5.0.mp4,এখন বর্ষাকাল,0.6870
+2,5.0,10.0,outputs\Test_data_result\story5_no_segment\clips\chunk_002_5.0_10.0.mp4,মামা মংগলবার মাংস খায়,0.3614
+3,10.0,15.0,outputs\Test_data_result\story5_no_segment\clips\chunk_003_10.0_15.0.mp4,ভালোবাসা দিবস,0.5646
+4,15.0,20.0,outputs\Test_data_result\story5_no_segment\clips\chunk_004_15.0_20.0.mp4,আমি অনেক দুর্বল,0.5035
+5,20.0,25.0,outputs\Test_data_result\story5_no_segment\clips\chunk_005_20.0_25.0.mp4,মামী বৃহস্পতিবার মাছ খায়,0.5738
+6,25.0,30.0,outputs\Test_data_result\story5_no_segment\clips\chunk_006_25.0_30.0.mp4,গরম পানি দিয়ে কুলি করি,0.5166
+7,30.0,31.77,outputs\Test_data_result\story5_no_segment\clips\chunk_007_30.0_31.8.mp4,আমার ভাই একজন ডাক্তার,0.9443

@@ -1,0 +1,13 @@
+{
+  "architecture": "CNN-BiLSTM-Attention-v3-final",
+  "input_dim": 258,
+  "num_frames": 32,
+  "num_classes": 3395,
+  "cnn_dim": 256,
+  "lstm_hidden": 256,
+  "lstm_layers": 2,
+  "bidirectional": true,
+  "attention_dim": 128,
+  "dropout": 0.2,
+  "description": "MediaPipe keypoints -> Residual 1D CNN -> BiLSTM -> Temporal Attention -> Bangla sentence class"
+}

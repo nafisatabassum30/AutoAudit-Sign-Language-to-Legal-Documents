@@ -1,0 +1,16 @@
+[
+  {
+    "split": "val",
+    "total": 752,
+    "correct": 417,
+    "wrong": 335,
+    "accuracy": 0.5545212765957447
+  },
+  {
+    "split": "test",
+    "total": 751,
+    "correct": 418,
+    "wrong": 333,
+    "accuracy": 0.5565912117177098
+  }
+]

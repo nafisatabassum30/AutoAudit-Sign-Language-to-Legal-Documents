@@ -1,0 +1,6 @@
+﻿story_id,video_file,segment_no,start_time,end_time,expected_sentence,predicted_sentence,confidence,auto_type,auto_filter_decision,clip_file
+story_05_normal_test,story_5_normal_test.mp4,1,00:00,00:06,আমার চাচা চোর,আমার ট্রাক অনেক সুন্দর,0.6852,unrelated,remove,outputs\long_video_prediction\clips\story_05_normal_test_segment_1.mp4
+story_05_normal_test,story_5_normal_test.mp4,2,00:07,00:10,আমার চাচা ফুটবল খেলা পছন্দ করে,আমি যাদুঘর দেখেছি,0.9952,unrelated,remove,outputs\long_video_prediction\clips\story_05_normal_test_segment_2.mp4
+story_05_normal_test,story_5_normal_test.mp4,3,00:11,00:16,আমার চাচা পেয়ারা খেতে পছন্দ করে,আমার আরো অনেক লাগবে,0.8765,unrelated,remove,outputs\long_video_prediction\clips\story_05_normal_test_segment_3.mp4
+story_05_normal_test,story_5_normal_test.mp4,4,00:17,00:25,আমার চাচাতো বোন ভার্সিটিতে পড়ালেখা করে,তোমার জন্মদিন ২১ আগষ্ট,0.2956,unrelated,remove,outputs\long_video_prediction\clips\story_05_normal_test_segment_4.mp4
+story_05_normal_test,story_5_normal_test.mp4,5,00:26,00:31,আমার চাচাতো ভাই ইউরোপ যাবে,আমার ভাই একজন ডাক্তার,0.8112,unrelated,remove,outputs\long_video_prediction\clips\story_05_normal_test_segment_5.mp4

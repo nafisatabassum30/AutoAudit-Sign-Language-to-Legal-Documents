@@ -1,0 +1,13 @@
+{
+  "architecture": "CNN-BiLSTM-Attention",
+  "input_dim": 258,
+  "num_frames": 32,
+  "num_classes": 3395,
+  "cnn_channels": 128,
+  "lstm_hidden": 256,
+  "lstm_layers": 2,
+  "bidirectional": true,
+  "attention_dim": 128,
+  "dropout": 0.25,
+  "note": "v3 model adapted from CNN feature + LSTM + temporal attention idea; input is MediaPipe keypoint sequence."
+}

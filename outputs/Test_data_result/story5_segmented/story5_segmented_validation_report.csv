@@ -1,0 +1,6 @@
+﻿segment_no,start_time,end_time,expected_sentence,predicted_sentence,confidence,type,filter_decision,original_index,match,clip_file
+1,00:00,00:06,আমার চাচা চোর,আমার ভাই রবিবার মাংস খায়,0.8336,crime,keep,2451,NO,outputs\Test_data_result\story5_segmented\clips\story5_segment_01.mp4
+2,00:07,00:10,আমার চাচা ফুটবল খেলা পছন্দ করে,আমার ভাই বাসে যাবে,0.5171,unrelated,remove,2470,NO,outputs\Test_data_result\story5_segmented\clips\story5_segment_02.mp4
+3,00:11,00:16,আমার চাচা পেয়ারা খেতে পছন্দ করে,ভিতরে আশুন এবং বসুন,0.2170,unrelated,remove,2489,NO,outputs\Test_data_result\story5_segmented\clips\story5_segment_03.mp4
+4,00:17,00:25,আমার চাচাতো বোন ভার্সিটিতে পড়ালেখা করে,আমার মেয়ে বৃহস্পতিবার মাছ খায়,0.9730,unrelated,remove,2497,NO,outputs\Test_data_result\story5_segmented\clips\story5_segment_04.mp4
+5,00:26,00:31,আমার চাচাতো ভাই ইউরোপ যাবে,তুমার সাথে তার কি সম্পর্ক,0.5656,unrelated,remove,2507,NO,outputs\Test_data_result\story5_segmented\clips\story5_segment_05.mp4

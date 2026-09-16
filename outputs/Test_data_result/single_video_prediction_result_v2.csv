@@ -1,0 +1,12 @@
+﻿label_class,video_number,video_file,expected_sentence,predicted_sentence,confidence,exact_match,normalized_match,status
+0,0,data\Test_data\single_videos\0.mp4,আপনি কেমন আছেন?,আপনি আমাকে সয্য করবেন,0.4389,NO,NO,OK
+1,1,data\Test_data\single_videos\1.mp4,আমি ভাল আছি,১ দিন পর আমি আসবো,0.9205,NO,NO,OK
+2,2,data\Test_data\single_videos\2.mp4,আপনার নাম কি?,"সকালে তুমি পাও রুটি, ডিম্, জেলি খাবে",0.2802,NO,NO,OK
+3,3,data\Test_data\single_videos\3.mp4,আপনি কোথায় থাকেন?,লেবুর শরবত খাওয়া,0.3990,NO,NO,OK
+4,4,data\Test_data\single_videos\4.mp4,আপনার কি কিছু প্রয়োজন?,আমি বিজিবি দেখেছি,0.9393,NO,NO,OK
+5,5,data\Test_data\single_videos\5.mp4,আপনি ভাল থাকবেন,আমি যুদ্ধবিমান দেখেছি,0.4390,NO,NO,OK
+6,6,data\Test_data\single_videos\6.mp4,আজকের দিনটা সুন্দর,আমার ভাষা বাংলা,0.5760,NO,NO,OK
+7,7,data\Test_data\single_videos\7.mp4,আপনাকে আমার ভাল লেগেছে,মামা সোমবার দু্‌ধ খায়,0.2649,NO,NO,OK
+8,8,data\Test_data\single_videos\8.mp4,আমার বাবা একজন ব্যবসায়ী,তোমার প্রিয় রং কি,0.7408,NO,NO,OK
+9,9,data\Test_data\single_videos\9 (2).mp4,শুভ সকাল,তোমার মামি ক্রিকেট খেলা পছন্দ করে,0.3571,NO,NO,OK
+10,10,data\Test_data\single_videos\10.mp4,শুভ রাত্রি,প্রথমটি A,0.5714,NO,NO,OK

@@ -1,0 +1,14 @@
+{
+  "num_classes": 3395,
+  "train_samples": 3507,
+  "val_samples": 752,
+  "test_samples": 751,
+  "best_val_acc": 0.3377659574468085,
+  "test_loss": 6.8766046491031165,
+  "test_acc": 0.3595206391478029,
+  "epochs": 35,
+  "batch_size": 32,
+  "hidden_size": 256,
+  "num_layers": 2,
+  "dropout": 0.4
+}

@@ -1,0 +1,12 @@
+﻿label_class,video_number,video_file,expected_sentence,expected_sentence_known_to_model,predicted_sentence,confidence,exact_match,status
+0,0,data\Test_data\single_videos\0.mp4,আপনি কেমন আছেন?,False,আমি এপ্রিল মাসে আফ্রিকা যাব,0.9999,NO,OK
+1,1,data\Test_data\single_videos\1.mp4,আমি ভাল আছি,False,আমার বাবার পাখি পছন্দ,0.5263,NO,OK
+2,2,data\Test_data\single_videos\2.mp4,আপনার নাম কি?,False,আমার কাক পছন্দ না,0000,NO,OK
+3,3,data\Test_data\single_videos\3.mp4,আপনি কোথায় থাকেন?,False,আমার কুকুর ভালো লাগে,0.9995,NO,OK
+4,4,data\Test_data\single_videos\4.mp4,আপনার কি কিছু প্রয়োজন?,False,আমার গরু ভালো লাগে,0.9999,NO,OK
+5,5,data\Test_data\single_videos\5.mp4,আপনি ভাল থাকবেন,False,আমার ঘোড়া ভাল লাগে,0000,NO,OK
+6,6,data\Test_data\single_videos\6.mp4,আজকের দিনটা সুন্দর,True,আমার ছাগল ভালো লাগে,0.9997,NO,OK
+7,7,data\Test_data\single_videos\7.mp4,আপনাকে আমার ভাল লেগেছে,False,আমার দোয়েল পছন্দ,0.9984,NO,OK
+8,8,data\Test_data\single_videos\8.mp4,আমার বাবা একজন ব্যবসায়ী,True,আমার পাহাড় দেখতে ভালো লাগে,0000,NO,OK
+9,9,data\Test_data\single_videos\9 (2).mp4,শুভ সকাল,True,আমার শোনার বাংলা,0.9524,NO,OK
+10,10,data\Test_data\single_videos\10.mp4,শুভ রাত্রি,True,আমার বাঘ ভয় করে,0000,NO,OK
