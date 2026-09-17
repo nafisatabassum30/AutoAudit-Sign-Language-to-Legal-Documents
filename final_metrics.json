@@ -1,0 +1,16 @@
+{
+  "vocab_size": 1447,
+  "train_samples": 3506,
+  "val_samples": 752,
+  "test_samples": 752,
+  "best_val_wer": 0.6283634061411839,
+  "test_loss": 7.743193098839293,
+  "test_wer": 0.6275071633237822,
+  "test_sentence_acc": 0.04654255319148936,
+  "epochs": 35,
+  "batch_size": 32,
+  "hidden_size": 256,
+  "num_lstm_layers": 2,
+  "cnn_layers": 3,
+  "dropout": 0.3
+}
