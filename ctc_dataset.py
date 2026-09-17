@@ -21,10 +21,10 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader, Dataset
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = Path(__file__).resolve().parent
 SPLIT_DIR = ROOT_DIR / "data" / "split_v4_no_leak"
-KEYPOINT_DIR = ROOT_DIR / "data" / "keypoints_full_64"
-VOCAB_DIR = Path(__file__).resolve().parent / "output"
+KEYPOINT_DIR = ROOT_DIR / "data" / "keypoints_full"
+VOCAB_DIR = ROOT_DIR
 
 TRAIN_FILE = SPLIT_DIR / "train_manifest.csv"
 VAL_FILE = SPLIT_DIR / "val_manifest.csv"

@@ -30,9 +30,9 @@ RESULT_DIR = Path(__file__).resolve().parent / "outputs"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 RESULT_DIR.mkdir(parents=True, exist_ok=True)
 
-NUM_EPOCHS = 35
+NUM_EPOCHS = 100
 BATCH_SIZE = 32
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.0003
 RANDOM_SEED = 42
 
 torch.manual_seed(RANDOM_SEED)

@@ -18,7 +18,7 @@ from pathlib import Path
 
 import pandas as pd
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = Path(__file__).resolve().parent
 OLD_SPLIT_DIR = ROOT_DIR / "data" / "split_v2"
 NEW_SPLIT_DIR = ROOT_DIR / "data" / "split_v4_no_leak"
 NEW_SPLIT_DIR.mkdir(parents=True, exist_ok=True)
@@ -27,6 +27,19 @@ RANDOM_SEED = 42
 # Target video counts, matching the original split's sizes for a fair comparison.
 TARGET_VAL = 752
 TARGET_TEST = 751
+
+
+def has_keypoints(index_value):
+    index_text = str(index_value).strip()
+    if index_text.endswith(".0"):
+        index_text = index_text[:-2]
+
+    candidates = [
+        Path("data/keypoints_full") / f"{index_text}.npy",
+        Path("data/keypoints_full") / f"keypoints_{index_text}.npy",
+        Path("data/keypoints_full") / "keypoints" / f"{index_text}.npy",
+    ]
+    return any(path.exists() for path in candidates)
 
 
 def main():
@@ -39,6 +52,10 @@ def main():
     all_rows = pd.concat([train, val, test], ignore_index=True)
     all_rows["sentence"] = all_rows["sentence"].astype(str).str.strip()
     all_rows = all_rows.drop_duplicates(subset="index")
+
+    before_filter = len(all_rows)
+    all_rows = all_rows[all_rows["index"].map(has_keypoints)].copy()
+    print("Rows without extracted keypoints skipped:", before_filter - len(all_rows))
 
     print("Total available videos:", len(all_rows))
     print("Total unique sentences:", all_rows["sentence"].nunique())

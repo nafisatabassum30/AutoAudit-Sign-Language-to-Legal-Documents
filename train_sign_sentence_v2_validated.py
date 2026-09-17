@@ -9,7 +9,7 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 
 
-SPLIT_DIR = Path("data/split_v2")
+SPLIT_DIR = Path("data/split_v4_no_leak")
 KEYPOINT_DIR = Path("data/keypoints_full")
 OUTPUT_DIR = Path("output/sign_sentence_v2_validated")
 RESULT_DIR = Path("outputs/sign_sentence_v2_validated")
@@ -21,12 +21,12 @@ TRAIN_FILE = SPLIT_DIR / "train_manifest.csv"
 VAL_FILE = SPLIT_DIR / "val_manifest.csv"
 TEST_FILE = SPLIT_DIR / "test_manifest.csv"
 
-NUM_EPOCHS = 35
+NUM_EPOCHS = 100
 BATCH_SIZE = 32
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.0003
 HIDDEN_SIZE = 256
 NUM_LAYERS = 2
-DROPOUT = 0.4
+DROPOUT = 0.3
 RANDOM_SEED = 42
 
 torch.manual_seed(RANDOM_SEED)
