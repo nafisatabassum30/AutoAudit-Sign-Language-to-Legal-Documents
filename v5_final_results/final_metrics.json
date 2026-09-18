@@ -1,0 +1,11 @@
+{
+    "test_samples": 752,
+    "ctc_wer": 0.5710707576706324,
+    "attention_wer": 0.5817157169693175,
+    "ctc_exact_sentence_accuracy": 0.009308510638297872,
+    "attention_exact_sentence_accuracy": 0.03856382978723404,
+    "best_hybrid_epoch": 15,
+    "validation_attention_wer": 0.6076069730586371,
+    "validation_ctc_wer": 0.5816164817749604,
+    "max_sentence_words": 13
+}
